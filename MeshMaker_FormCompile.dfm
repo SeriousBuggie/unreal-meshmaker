@@ -41,8 +41,6 @@ object FormCompile: TFormCompile
     Top = 35
     Width = 264
     Height = 15
-    Min = 0
-    Max = 100
     Step = 1
     TabOrder = 1
   end

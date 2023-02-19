@@ -40,7 +40,7 @@ type
     TextFilePackage: string;
     TextFilePackageOld: string;
 
-    procedure PipedProcessOutput(Sender: TObject; Data: string; Pipe: TPipedOutput);
+    procedure PipedProcessOutput(Sender: TObject; const Data: string; Pipe: TPipedOutput);
     procedure PipedProcessTerminate(Sender: TObject);
 
   public
@@ -191,7 +191,7 @@ begin
 end;
 
 
-procedure TFormCompile.PipedProcessOutput(Sender: TObject; Data: string; Pipe: TPipedOutput);
+procedure TFormCompile.PipedProcessOutput(Sender: TObject; const Data: string; Pipe: TPipedOutput);
 var
   IndexCharError: Integer;
   IndexCharSeparator: Integer;
