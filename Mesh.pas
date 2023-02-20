@@ -640,6 +640,7 @@ var
 
   function ReadPolygon: Boolean;
   var
+	I: Integer;
     CountVertices: Integer;
     FlagsSurface: TFlagsSurface;
     FlagsSurfaceNative: Integer;
@@ -713,6 +714,8 @@ var
     VectorTextureV := VectorNull;
 
     TextSkin := ParseParameter(TextParameters, 'texture');
+    I := Pos(TextSkin, '.') + 1;
+    if I > 1 then TextSkin := Copy(TextSkin, I, Length(TextSkin) - I);
     if Length(TextSkin) = 0 then TextSkin := 'None';
 
     FlagsSurfaceNative := Trunc(ParseNumber(ParseParameter(TextParameters, 'flags')));
@@ -799,6 +802,10 @@ var
       end;
 
       Inc(FCountPolygons);
+
+//      TexelPan       := TexelNull;
+//      ScaleU := 1;
+//      ScaleV := 1;
 
       for IndexVertex := 1 to CountVertices - 2 do
       begin

@@ -5,7 +5,7 @@ interface
 
 
 uses
-  Windows, Shellapi, ShlObj, Registry, Messages, SysUtils, Classes;
+  Windows, Shellapi, ShlObj, Registry, Messages, SysUtils, Classes, Controls, CommDlg;
 
 
 (*****************************************************************************)
@@ -34,6 +34,9 @@ function GetQuotedParam(TextParam: string): string;
 
 function LaunchProgram(TextCommand: string): Boolean;
 
+function OpenSaveFileDialog(ParentHandle: THandle; const DefExt, Filter, InitialDir, Title: string; var FileName:
+string;
+  MustExist, OverwritePrompt, NoChangeDir, DoOpen: Boolean): Boolean;
 
 (*****************************************************************************)
 (*  TThreadPipeRead
@@ -753,5 +756,66 @@ begin
   end;
 end;
 
+function CharReplace(const Source: string; oldChar, newChar: Char): string;
+var
+  i: Integer;
+begin
+  Result := Source;
+  for i := 1 to Length(Result) do
+    if Result[i] = oldChar then
+      Result[i] := newChar
+end;
+
+function OpenSaveFileDialog(ParentHandle: THandle; const DefExt, Filter, InitialDir, Title: string; var FileName:
+string;
+  MustExist, OverwritePrompt, NoChangeDir, DoOpen: Boolean): Boolean;
+var
+  ofn: TOpenFileName;
+  szFile: array[0..MAX_PATH] of Char;
+begin
+  Result := False;
+  FillChar(ofn, SizeOf(TOpenFileName), 0);
+  with ofn do
+  begin
+    lStructSize := SizeOf(TOpenFileName);
+    hwndOwner := ParentHandle;
+    lpstrFile := szFile;
+    nMaxFile := SizeOf(szFile);
+    if (Title <> '') then
+      lpstrTitle := PChar(Title);
+    if (InitialDir <> '') then
+      lpstrInitialDir := PChar(InitialDir);
+    StrPCopy(lpstrFile, FileName);
+    lpstrFilter := PChar(CharReplace(Filter, '|', #0)+#0#0);
+    if DefExt <> '' then
+      lpstrDefExt := PChar(DefExt);
+  end;
+
+  if MustExist then
+    ofn.Flags := ofn.Flags or OFN_FILEMUSTEXIST;
+
+  if OverwritePrompt then
+    ofn.Flags := ofn.Flags or OFN_OVERWRITEPROMPT;
+
+  if NoChangeDir then
+    ofn.Flags := ofn.Flags or OFN_NOCHANGEDIR;
+
+  if DoOpen then
+  begin
+    if GetOpenFileName(ofn) then
+    begin
+      Result := True;
+      FileName := StrPas(szFile);
+    end;
+  end
+  else
+  begin
+    if GetSaveFileName(ofn) then
+    begin
+      Result := True;
+      FileName := StrPas(szFile);
+    end;
+  end
+end;
 
 end.

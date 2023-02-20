@@ -142,6 +142,8 @@ type
     TabSheetPrefab: TTabSheet;
     TabSheetDone: TTabSheet;
     TimerEmail: TTimer;
+    LabelPasteBrush: TLabel;
+    MemoPasteBrush: TMemo;
 
     procedure ButtonBackClick(Sender: TObject);
     procedure ButtonBrowsePrefabClick(Sender: TObject);
@@ -171,6 +173,7 @@ type
     procedure StringGridTexturesSelectCell(Sender: TObject; ACol, ARow: Integer; var CanSelect: Boolean);
     procedure TabSheetPrefabShow(Sender: TObject);
     procedure TimerEmailTimer(Sender: TObject);
+    procedure MemoPasteBrushChange(Sender: TObject);
 
   private
     BitmapCheck: TBitmap;
@@ -1063,13 +1066,17 @@ end;
 
 
 procedure TFormMain.ButtonBrowsePrefabClick(Sender: TObject);
+var Filename: String;
 begin
   TextPrefabEditing;
 
-  if OpenDialogPrefab.Execute then
+  if OpenSaveFileDialog(Application.Handle, OpenDialogPrefab.DefaultExt,
+  	OpenDialogPrefab.Filter, OpenDialogPrefab.InitialDir, OpenDialogPrefab.Title,
+    FileName, True, False, False, True) then
   begin
     try ChDir(TextDirectoryUnreal) except on Exception do end;
-    TextPrefabEdited(GetRelativePath(OpenDialogPrefab.FileName, TextDirectoryUnreal));
+    OpenDialogPrefab.FileName := FileName;
+    TextPrefabEdited(GetRelativePath(FileName, TextDirectoryUnreal));
   end;
 
   EditPrefab.SetFocus;
@@ -1549,6 +1556,15 @@ end;
 procedure TFormMain.TimerEmailTimer(Sender: TObject);
 begin
   LabelEmail_NoLocMouseMove(Sender, [], Mouse.CursorPos.X - LabelEmail_NoLoc.ClientOrigin.X, Mouse.CursorPos.Y - LabelEmail_NoLoc.ClientOrigin.Y);
+end;
+
+procedure TFormMain.MemoPasteBrushChange(Sender: TObject);
+var FileName: String;
+begin
+	FileName := ExtractFilePath(ParamStr(0)) + 'MeshMaker_paste.tmp';
+	MemoPasteBrush.Lines.SaveToFile(FileName);
+    EditPrefab.Text := FileName;
+    TextPrefabEdited(EditPrefab.Text)
 end;
 
 end.
